@@ -10,8 +10,6 @@ type WS = WebSocket<MaybeTlsStream<TcpStream>>;
 mod bot;
 
 fn main() {
-    println!("Hello, world!");
-
     let (mut conn, _) =
         tungstenite::connect("ws://localhost:4900").expect("Failed to connect to server");
 
