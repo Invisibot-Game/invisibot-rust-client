@@ -1,6 +1,9 @@
 use std::net::TcpStream;
 
-use invisibot_game::{clients::game_message::GameMessage, utils::direction::Direction};
+use invisibot_game::{
+    clients::{game_message::GameMessage, round_response::RoundResponse},
+    utils::direction::Direction,
+};
 use tungstenite::{stream::MaybeTlsStream, Message, WebSocket};
 type WS = WebSocket<MaybeTlsStream<TcpStream>>;
 
@@ -18,7 +21,7 @@ fn main() {
 }
 
 fn listen_on_server(conn: &mut WS) {
-    let mut prev_move: Direction = Direction::Down;
+    let mut prev_move: Option<Direction> = None;
     loop {
         let msg = conn
             .read_message()
@@ -31,8 +34,9 @@ fn listen_on_server(conn: &mut WS) {
         println!("==> {}", parsed.message_type());
         match parsed {
             GameMessage::GameRound(game_round) => {
-                let round_move = bot::handle_round(&game_round, &prev_move);
-                prev_move = round_move.get_dir();
+                let dir = bot::handle_round(&game_round, &prev_move);
+                prev_move = dir.clone();
+                let round_move = RoundResponse::new(dir.unwrap_or(Direction::Down));
                 println!("<== {round_move:?}");
 
                 let serialized =

@@ -1,17 +1,21 @@
 use invisibot_game::{
-    clients::{game_message::GameRound, round_response::RoundResponse},
+    clients::game_message::GameRound,
     game_logic::game_map::TileType,
     utils::{coordinate::Coordinate, direction::Direction},
 };
 
-pub fn handle_round(game_round: &GameRound, prev_move: &Direction) -> RoundResponse {
+pub fn handle_round(game_round: &GameRound, prev_move: &Option<Direction>) -> Option<Direction> {
     let dir = get_free_directions(game_round)
         .into_iter()
-        .filter(|d| d != &prev_move.opposite())
-        .last()
-        .expect("No free dirs to go to? :(")
-        .clone();
-    RoundResponse::new(dir)
+        .filter(|d| {
+            if let Some(m) = prev_move {
+                d != &m.opposite()
+            } else {
+                true
+            }
+        })
+        .last();
+    dir
 }
 
 fn get_free_directions(game_round: &GameRound) -> Vec<Direction> {
