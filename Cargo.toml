@@ -10,3 +10,4 @@ invisibot_game = { git = "https://github.com/ViddeM/invisibot", branch = "featur
 tungstenite = "0.19.0"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
+rand = "0.8.5"
