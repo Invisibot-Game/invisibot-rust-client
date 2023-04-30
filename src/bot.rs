@@ -1,7 +1,6 @@
 use invisibot_game::{
     clients::game_message::GameRound,
-    game_logic::game_map::TileType,
-    utils::{coordinate::Coordinate, direction::Direction},
+    utils::{coordinate::Coordinate, direction::Direction, tile_type::TileType},
 };
 use rand::seq::SliceRandom;
 

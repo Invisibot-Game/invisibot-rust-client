@@ -12,6 +12,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "bmp"
+version = "0.5.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "69985ff4f58085ac696454692d0b646a66ad1f9cc9be294c91dc51bb5df511ae"
+dependencies = [
+ "byteorder",
+]
+
+[[package]]
 name = "byteorder"
 version = "1.4.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -141,8 +150,9 @@ dependencies = [
 [[package]]
 name = "invisibot_game"
 version = "0.1.0"
-source = "git+https://github.com/ViddeM/invisibot?branch=feature/clients-question-mark#5f6f2a2488a8d4c65e2e2905b82d63749bfc3998"
+source = "git+https://github.com/ViddeM/invisibot#10ce47215b54b50e27b6964daedcd1f90654243e"
 dependencies = [
+ "bmp",
  "rand",
  "serde",
  "thiserror",
