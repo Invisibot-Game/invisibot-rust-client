@@ -1,14 +1,14 @@
 use invisibot_game::{
-    clients::game_message::GameRound,
+    clients::{game_message::GameRound, round_response::RoundResponse},
     utils::{coordinate::Coordinate, direction::Direction, tile_type::TileType},
 };
 use rand::seq::SliceRandom;
 
-pub fn handle_round(game_round: &GameRound, prev_move: &Option<Direction>) -> Option<Direction> {
+pub fn handle_round(game_round: &GameRound, prev_move: &RoundResponse) -> RoundResponse {
     let mut available_dirs: Vec<Direction> = get_free_directions(game_round)
         .into_iter()
         .filter(|d| {
-            if let Some(m) = prev_move {
+            if let RoundResponse::Move(m) = prev_move {
                 d != &m.opposite()
             } else {
                 true
@@ -19,7 +19,12 @@ pub fn handle_round(game_round: &GameRound, prev_move: &Option<Direction>) -> Op
     let mut rng = rand::thread_rng();
     available_dirs.shuffle(&mut rng);
 
-    available_dirs.first().map(|d| d.clone())
+    RoundResponse::Move(
+        available_dirs
+            .first()
+            .map(|d| d.clone())
+            .unwrap_or(Direction::Down),
+    )
 }
 
 fn get_free_directions(game_round: &GameRound) -> Vec<Direction> {

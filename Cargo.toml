@@ -6,7 +6,7 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-invisibot_game = { git = "https://github.com/ViddeM/invisibot" }
+invisibot_game = { git = "https://github.com/ViddeM/invisibot", branch = "feature/shooting" }
 tungstenite = "0.19.0"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"

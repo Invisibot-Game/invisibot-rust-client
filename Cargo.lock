@@ -150,7 +150,7 @@ dependencies = [
 [[package]]
 name = "invisibot_game"
 version = "0.1.0"
-source = "git+https://github.com/ViddeM/invisibot#10ce47215b54b50e27b6964daedcd1f90654243e"
+source = "git+https://github.com/ViddeM/invisibot?branch=feature/shooting#abefad6be0b833dadfec1ddf03f8093a5217ed3d"
 dependencies = [
  "bmp",
  "rand",
