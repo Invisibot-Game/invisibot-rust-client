@@ -1,9 +1,6 @@
 use std::net::TcpStream;
 
-use invisibot_game::{
-    clients::{game_message::GameMessage, round_response::RoundResponse},
-    utils::direction::Direction,
-};
+use invisibot_game::clients::{game_message::GameMessage, round_response::RoundResponse};
 use rand::{thread_rng, Rng};
 use tungstenite::{stream::MaybeTlsStream, Message, WebSocket};
 type WS = WebSocket<MaybeTlsStream<TcpStream>>;
@@ -56,6 +53,9 @@ fn listen_on_server(conn: &mut WS) {
             }
             GameMessage::PlayerKilled(id) => {
                 println!("Player died {id}");
+            }
+            GameMessage::PlayerWon(id) => {
+                println!("We won! (Also we had id {id}");
             }
             _ => {}
         }
