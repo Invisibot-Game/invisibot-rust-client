@@ -30,8 +30,7 @@ fn listen_on_server(conn: &mut WS) {
             .expect("Failed to read message from server");
 
         let message_text = msg.into_text().expect("Message was not 'text'?");
-        let parsed: GameMessage =
-            serde_json::from_str(&message_text).expect("Failed to parse message");
+        let Ok(parsed): Result<GameMessage, _> = serde_json::from_str(&message_text) else { continue; };
 
         println!("==> {}", parsed.message_type());
         match parsed {
@@ -54,6 +53,9 @@ fn listen_on_server(conn: &mut WS) {
             GameMessage::ClientGoodbye(msg) => {
                 println!("Server shutting down with message: {msg}");
                 return;
+            }
+            GameMessage::PlayerKilled(id) => {
+                println!("Player died {id}");
             }
             _ => {}
         }
