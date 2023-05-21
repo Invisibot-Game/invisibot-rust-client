@@ -1,22 +1,40 @@
-use std::net::TcpStream;
+use std::{env, net::TcpStream, str::FromStr};
 
 use invisibot_game::clients::{game_message::GameMessage, round_response::RoundResponse};
 use rand::{thread_rng, Rng};
+use serde::{Deserialize, Serialize};
 use tungstenite::{stream::MaybeTlsStream, Message, WebSocket};
+use uuid::Uuid;
 type WS = WebSocket<MaybeTlsStream<TcpStream>>;
 
 mod bot;
 
 fn main() {
+    let args: Vec<String> = env::args().collect();
+    if args.len() != 2 {
+        panic!(
+            "Invalid, expected exactly 1 argument for game id, got '{}'",
+            args.join(", ")
+        );
+    }
+
+    let id = args.last().unwrap();
+    let game_id = Uuid::from_str(id).expect("Invalid UUID");
+
     let (mut conn, _) =
         tungstenite::connect("ws://localhost:4900").expect("Failed to connect to server");
 
-    listen_on_server(&mut conn);
+    listen_on_server(&mut conn, game_id);
 
     conn.close(None).unwrap();
 }
 
-fn listen_on_server(conn: &mut WS) {
+#[derive(Debug, Clone, Serialize, Deserialize)]
+struct ConnectResponse {
+    game_id: Uuid,
+}
+
+fn listen_on_server(conn: &mut WS, game_id: Uuid) {
     let mut rng = thread_rng();
     let mut turns_until_shoot = rng.gen_range(3..=7);
     let mut prev_move: RoundResponse = RoundResponse::Shoot;
@@ -31,6 +49,13 @@ fn listen_on_server(conn: &mut WS) {
 
         println!("==> {}", parsed.message_type());
         match parsed {
+            GameMessage::ClientHello => {
+                let connect_response = ConnectResponse { game_id };
+                let serialized = serde_json::to_string(&connect_response)
+                    .expect("Failed to serialize ClientHello response");
+                conn.write_message(Message::text(serialized))
+                    .expect("Failed to send connect response");
+            }
             GameMessage::GameRound(game_round) => {
                 let round_move = if turns_until_shoot == 0 {
                     turns_until_shoot = rng.gen_range(3..=7);
