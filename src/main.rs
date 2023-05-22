@@ -78,9 +78,11 @@ fn listen_on_server(conn: &mut WS, game_id: Uuid) {
             }
             GameMessage::PlayerKilled(id) => {
                 println!("Player died {id}");
+                return;
             }
             GameMessage::PlayerWon(id) => {
                 println!("We won! (Also we had id {id}");
+                return;
             }
             GameMessage::GameNotFound(id) => {
                 println!("No such game {id}");
