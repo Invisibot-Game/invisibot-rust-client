@@ -82,7 +82,14 @@ fn listen_on_server(conn: &mut WS, game_id: Uuid) {
             GameMessage::PlayerWon(id) => {
                 println!("We won! (Also we had id {id}");
             }
-            _ => {}
+            GameMessage::GameNotFound(id) => {
+                println!("No such game {id}");
+                return;
+            }
+            GameMessage::GameStarted => {
+                println!("The game has already started");
+                return;
+            }
         }
     }
 }
