@@ -1,8 +1,5 @@
-use invisibot_game::{
-    clients::{game_message::GameRound, round_response::RoundResponse},
-    game_map::tile_type::TileType,
-    utils::{coordinate::Coordinate, direction::Direction},
-};
+use invisibot_client_api::{game_message::GameRound, round_response::RoundResponse};
+use invisibot_common::{coordinate::Coordinate, direction::Direction, tile_type::TileType};
 use rand::seq::SliceRandom;
 
 pub fn handle_round(game_round: &GameRound, prev_move: &RoundResponse) -> RoundResponse {

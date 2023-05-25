@@ -1,10 +1,14 @@
 use std::{env, net::TcpStream, str::FromStr};
 
-use invisibot_game::clients::{game_message::GameMessage, round_response::RoundResponse};
+use invisibot_client_api::{
+    connect_response::{ClientType, ConnectResponse},
+    game_message::GameMessage,
+    round_response::RoundResponse,
+};
+use invisibot_common::GameId;
 use rand::{thread_rng, Rng};
-use serde::{Deserialize, Serialize};
 use tungstenite::{stream::MaybeTlsStream, Message, WebSocket};
-use uuid::Uuid;
+
 type WS = WebSocket<MaybeTlsStream<TcpStream>>;
 
 mod bot;
@@ -19,7 +23,7 @@ fn main() {
     }
 
     let id = args.last().unwrap();
-    let game_id = Uuid::from_str(id).expect("Invalid UUID");
+    let game_id = GameId::from_str(id).expect("Invalid UUID");
 
     let (mut conn, _) =
         tungstenite::connect("ws://localhost:4900").expect("Failed to connect to server");
@@ -29,12 +33,7 @@ fn main() {
     conn.close(None).unwrap();
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
-struct ConnectResponse {
-    game_id: Uuid,
-}
-
-fn listen_on_server(conn: &mut WS, game_id: Uuid) {
+fn listen_on_server(conn: &mut WS, game_id: GameId) {
     let mut rng = thread_rng();
     let mut turns_until_shoot = rng.gen_range(3..=7);
     let mut prev_move: RoundResponse = RoundResponse::Shoot;
@@ -50,7 +49,10 @@ fn listen_on_server(conn: &mut WS, game_id: Uuid) {
         println!("==> {}", parsed.message_type());
         match parsed {
             GameMessage::ClientHello => {
-                let connect_response = ConnectResponse { game_id };
+                let connect_response = ConnectResponse {
+                    game_id,
+                    client_type: ClientType::Player,
+                };
                 let serialized = serde_json::to_string(&connect_response)
                     .expect("Failed to serialize ClientHello response");
                 conn.write_message(Message::text(serialized))
@@ -92,6 +94,7 @@ fn listen_on_server(conn: &mut WS, game_id: Uuid) {
                 println!("The game has already started");
                 return;
             }
+            GameMessage::GameRoundSpectators(_) => { /* Not relevant to us */ }
         }
     }
 }
